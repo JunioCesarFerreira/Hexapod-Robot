@@ -16,7 +16,7 @@
 class ServoController
 {
     public:
-        void begin();
+        void begin(const int8_t servo_pinout[SERVOS_AMOUNT]);
         void set(uint8_t servo, uint16_t value);
 };
 

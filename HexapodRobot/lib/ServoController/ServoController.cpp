@@ -2,16 +2,8 @@
 
 hw_timer_t *hw_timer = NULL;
 uint16_t countTimer = 0;
-uint16_t servo_boundery[SERVOS_AMOUNT];
-int8_t servos[SERVOS_AMOUNT] =
-{
-   1, 2, 3, 
-   4, 5, 6,
-   7, 8, 9,
-  10, 11, 12,
-  13, 14, -1,
-  -1, -1, -1
-};
+uint16_t servos_boundery[SERVOS_AMOUNT];
+int8_t servos_pinout[SERVOS_AMOUNT];
 
 void IRAM_ATTR onTimer()
 {
@@ -21,9 +13,9 @@ void IRAM_ATTR onTimer()
     countTimer=0;  
     for(uint8_t i=0;i<SERVOS_AMOUNT; i++)
     {
-      if (servos[i]>-1)
+      if (servos_pinout[i]>-1)
       {
-        digitalWrite(servos[i], 1);
+        digitalWrite(servos_pinout[i], 1);
       }
     }
   }
@@ -31,22 +23,23 @@ void IRAM_ATTR onTimer()
   {
     for(uint8_t i=0;i<SERVOS_AMOUNT; i++)
     {
-      if (servos[i]>-1)
+      if (servos_pinout[i]>-1)
       {
-        if (servo_boundery[i]<=countTimer)
+        if (servos_boundery[i]<=countTimer)
         {
-          digitalWrite(servos[i], 0);
+          digitalWrite(servos_pinout[i], 0);
         }
       }
     }
   }
 }
 
-void ServoController::begin()
+void ServoController::begin(const int8_t servo_pinout[SERVOS_AMOUNT])
 {
   for(uint8_t i=0;i<SERVOS_AMOUNT; i++)
   {
-    if (servos[i]>0) pinMode(servos[i], OUTPUT);
+    servos_pinout[i] = servo_pinout[i];
+    if (servos_pinout[i]>0) pinMode(servos_pinout[i], OUTPUT);
   }
   hw_timer= timerBegin(0, 20, true);
   timerAttachInterrupt(hw_timer, &onTimer, true);
@@ -56,5 +49,5 @@ void ServoController::begin()
 
 void ServoController::set(uint8_t servo, uint16_t value)
 {
-    servo_boundery[servo] = value;
+    servos_boundery[servo] = value;
 }
