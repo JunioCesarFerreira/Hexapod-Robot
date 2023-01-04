@@ -3,19 +3,27 @@
 
 #include <ServoController.h>
 
+// Single leg class
 class Leg
 {
     private:
+        // Micro servos motors controller.
         ServoController *servo_control;
-        uint8_t thigh_joint;
-        uint8_t femur_joint;
-        uint8_t tibia_joint;
-        uint8_t positions[3];
-        uint8_t parametersTask[4];
+
+        // Leg joints servo indexers.
+        uint8_t coxa_joint_i;
+        uint8_t femur_joint_i;
+        uint8_t tibia_joint_i;
+
+        // Current positions of leg joints.
+        uint8_t positions[3]; // [coxa, femur, tibia]
+
+        // Parameters used in motion task.
+        uint8_t taskParameters[4]; // [coxaPos, femurPos, tibiaPos, parameterVel]
 
     private:
-        // Normalized position (0 to 100)
-        inline uint16_t convert(uint8_t pos)
+        // Normalized position [0 to 100].
+        inline uint16_t denormalizes(uint8_t pos)
         {
             const uint16_t range = SERVO_CONTROL_SUP-SERVO_CONTROL_INF;
             pos = (pos*range)/100;
@@ -23,84 +31,90 @@ class Leg
             return pos;
         }
 
-        // Abs distance
-        inline uint8_t posDistance(uint8_t v1, uint8_t v2)
+        // Absolute distance of positions.
+        inline uint8_t positionDistance(uint8_t v1, uint8_t v2)
         {
             return v1>v2 ? v1-v2 : v2-v1;
         }
 
-        static void movimentTask(void* p)
+        // Motion task function.
+        static void motionTask(void* p)
         {
+            // Recovery leg object
             Leg *leg = (Leg*)p;
-            uint8_t thighJointPos = leg->parametersTask[0]; 
-            uint8_t femurJointPos = leg->parametersTask[1]; 
-            uint8_t tibiaJointPos = leg->parametersTask[2];
-            uint8_t vel = leg->parametersTask[3];
-            leg->set(thighJointPos, femurJointPos, tibiaJointPos, vel);
+            // Set motion
+            leg->moveWithTaskParameters();
 	        vTaskDelete(NULL);
+        }
+
+        // Moves using task parameters array
+        inline void moveWithTaskParameters()
+        {
+            // Parameters: coxaJointPos, femurJointPos, tibiaJointPos, vdelay
+            moveTo(taskParameters[0], taskParameters[1], taskParameters[2], taskParameters[3]);
         }
 
     public:
         Leg() { }
-        Leg(uint8_t thighJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
+        Leg(uint8_t coxaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
         {
-            thigh_joint = thighJoint;
-            femur_joint = femurJoint;
-            tibia_joint = tibiaJoint;
+            coxa_joint_i = coxaJoint;
+            femur_joint_i = femurJoint;
+            tibia_joint_i = tibiaJoint;
             servo_control = servoControl;
         }
 
-        void set(uint8_t thighJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
+        void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
         {
-            positions[0] = convert(thighJointPos);
-            positions[1] = convert(femurJointPos);
-            positions[2] = convert(tibiaJointPos);
+            positions[0] = denormalizes(coxaJointPos);
+            positions[1] = denormalizes(femurJointPos);
+            positions[2] = denormalizes(tibiaJointPos);
             
-            servo_control->set(thigh_joint, positions[0]);
-            servo_control->set(femur_joint, positions[1]);
-            servo_control->set(tibia_joint, positions[2]);
+            servo_control->set(coxa_joint_i, positions[0]);
+            servo_control->set(femur_joint_i, positions[1]);
+            servo_control->set(tibia_joint_i, positions[2]);
         }
 
-        void setBackground(uint8_t thighJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vel)
+        void movimentInTask(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
         {
-            parametersTask[0]=thighJointPos;
-            parametersTask[1]=femurJointPos;
-            parametersTask[2]=tibiaJointPos;
-            parametersTask[3]=vel;
+            taskParameters[0]=coxaJointPos;
+            taskParameters[1]=femurJointPos;
+            taskParameters[2]=tibiaJointPos;
+            taskParameters[3]=vdelay;
 		    xTaskCreate(
-			    movimentTask, /* Task function. */
-			    "movimentTask", /* String with name of task. */
-			    2048, /* Stack size in bytes. */
-			    this, /* Parameter passed as input of the task */
-			    2, /* Priority of the task. */
-			    NULL); /* Task handle. */
+			    motionTask,   // Task function.
+			    "motionTask", // String with name of task.
+			    2048,         // Stack size in bytes.
+			    this,         // Parameter passed as input of the task.
+			    2,            // Priority of the task.
+			    NULL);        // Task handle.
         }
 
-        void set(uint8_t thighJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vel)
+        void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
         {
             uint16_t values[3] = 
             {
-                convert(thighJointPos), 
-                convert(femurJointPos), 
-                convert(tibiaJointPos)
+                denormalizes(coxaJointPos), 
+                denormalizes(femurJointPos), 
+                denormalizes(tibiaJointPos)
             };
             uint8_t *joints[3] = 
             {
-                &thigh_joint, 
-                &femur_joint, 
-                &tibia_joint
+                &coxa_joint_i, 
+                &femur_joint_i, 
+                &tibia_joint_i
             };
-            uint8_t difs[3] =
+            uint8_t distances[3] =
             {
-                posDistance(positions[0], values[0]),
-                posDistance(positions[1], values[1]),
-                posDistance(positions[2], values[2])
+                positionDistance(positions[0], values[0]),
+                positionDistance(positions[1], values[1]),
+                positionDistance(positions[2], values[2])
             };
 
             uint8_t max = 0;
             for (uint8_t i=0; i<3; i++)
             {
-                if (max<difs[i]) max = difs[i];
+                if (max<distances[i]) max = distances[i];
             }
             
             for (uint8_t t=0; t<max; t++)
@@ -117,12 +131,13 @@ class Leg
                     }
                     servo_control->set(*joints[i], positions[i]);
                 }
-                vTaskDelay(pdMS_TO_TICKS(vel));
+                vTaskDelay(pdMS_TO_TICKS(vdelay));
             }
         }
 };
 
-class Legs
+// Hexapod legs class
+class HexaLegs
 {
     private:
         static const uint8_t legs_number=6;
@@ -136,19 +151,19 @@ class Legs
         Leg L3;
         Leg *Legs[legs_number] ={ &R1, &R2, &R3, &L1, &L2, &L3 };
 
-        void setAll(uint8_t thighJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vel)
+        void moveAll(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
         {
             for (uint8_t i=0; i<legs_number; i++)
             {
-                Legs[i]->setBackground(thighJointPos, femurJointPos, tibiaJointPos, vel);
+                Legs[i]->movimentInTask(coxaJointPos, femurJointPos, tibiaJointPos, vdelay);
             }
         }
 
-        void setAll(uint8_t thighJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
+        void moveAll(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
         {
             for (uint8_t i=0; i<6; i++)
             {
-                Legs[i]->set(thighJointPos, femurJointPos, tibiaJointPos);
+                Legs[i]->moveTo(coxaJointPos, femurJointPos, tibiaJointPos);
             }
         }
 };
