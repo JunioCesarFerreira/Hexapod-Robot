@@ -36,23 +36,28 @@ void setup()
 
 void loop() 
 {
-  /*
   // single leg movement test.
-  legs.R1.set(25,25,5,20);
-  legs.R1.set(25,65,25,20);
-  legs.R1.set(75,65,25,20);
-  legs.R1.set(75,45,15,20);
-  */
+  hexaLegs.R1.moveTo(25,25,5,20);
+  hexaLegs.R1.moveTo(25,65,25,20);
+  hexaLegs.R1.moveTo(65,65,25,20);
+  hexaLegs.R1.moveTo(65,45,15,20);
 
+/*
   // checking tibia joint.
   hexaLegs.moveAll(50,5,1,60);
-  delay(3000);
+  hexaLegs.waitMotion();
   hexaLegs.moveAll(50,5,20,40);
+  hexaLegs.waitMotion();
+  delay(3000);
+  hexaLegs.moveAll(50,5,50,40);
+  hexaLegs.waitMotion();
   delay(3000);
 
   // standing up for the first time!
   hexaLegs.moveAll(50,5,1,60);
-  delay(3000);
+  hexaLegs.waitMotion();
   hexaLegs.moveAll(50,50,20,60);
+  hexaLegs.waitMotion();
   delay(3000);
+*/
 }

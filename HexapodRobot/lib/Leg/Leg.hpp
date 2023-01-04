@@ -20,6 +20,7 @@ class Leg
 
         // Parameters used in motion task.
         uint8_t taskParameters[4]; // [coxaPos, femurPos, tibiaPos, parameterVel]
+        bool inMotion;
 
     private:
         // Normalized position [0 to 100].
@@ -44,6 +45,7 @@ class Leg
             Leg *leg = (Leg*)p;
             // Set motion
             leg->moveWithTaskParameters();
+            leg->inMotion = false;
 	        vTaskDelete(NULL);
         }
 
@@ -55,13 +57,22 @@ class Leg
         }
 
     public:
-        Leg() { }
+        Leg() 
+        { 
+            inMotion=false;
+        }
         Leg(uint8_t coxaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
         {
+            inMotion=false;
             coxa_joint_i = coxaJoint;
             femur_joint_i = femurJoint;
             tibia_joint_i = tibiaJoint;
             servo_control = servoControl;
+        }
+
+        bool isInMotion()
+        {
+            return inMotion;
         }
 
         void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
@@ -77,6 +88,7 @@ class Leg
 
         void movimentInTask(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
         {
+            inMotion=true;
             taskParameters[0]=coxaJointPos;
             taskParameters[1]=femurJointPos;
             taskParameters[2]=tibiaJointPos;
@@ -164,6 +176,20 @@ class HexaLegs
             for (uint8_t i=0; i<6; i++)
             {
                 Legs[i]->moveTo(coxaJointPos, femurJointPos, tibiaJointPos);
+            }
+        }
+
+        bool isInMotion()
+        {
+            return R1.isInMotion() || R2.isInMotion() || R3.isInMotion()
+                || L1.isInMotion() || L2.isInMotion() || L3.isInMotion();
+        }
+
+        void waitMotion()
+        {
+            while (isInMotion())
+            {
+                delay(10);
             }
         }
 };
