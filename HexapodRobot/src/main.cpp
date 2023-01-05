@@ -23,21 +23,14 @@ void setup()
 
   servoControl.begin(servos_pinout);
 
-  hexaLegs.R1 = Leg(0,1,2, &servoControl);
-  hexaLegs.R2 = Leg(3,4,5, &servoControl);
-  hexaLegs.R3 = Leg(6,7,8, &servoControl);
-  hexaLegs.L1 = Leg(15,16,17, &servoControl);
-  hexaLegs.L2 = Leg(12,13,14, &servoControl);
-  hexaLegs.L3 = Leg(9,10,11, &servoControl);
+  hexaLegs.R1 = HikingLeg(0,1,2, &servoControl);
+  hexaLegs.R2 = HikingLeg(3,4,5, &servoControl);
+  hexaLegs.R3 = HikingLeg(6,7,8, &servoControl);
+  hexaLegs.L1 = HikingLeg(15,16,17, &servoControl);
+  hexaLegs.L2 = HikingLeg(12,13,14, &servoControl);
+  hexaLegs.L3 = HikingLeg(9,10,11, &servoControl);
 
   hexaMotion.retractedPosition();
-  delay(3000);
-
-  hexaMotion.checkingTibiaJoint();
-  hexaMotion.retractedPosition();
-  hexaMotion.checkingFemurJoint();
-  hexaMotion.retractedPosition();
-
   delay(3000);
 
   hexaMotion.standingUp();
@@ -48,5 +41,28 @@ void setup()
 
 void loop() 
 {
-  hexaMotion.tripodGaitCycle();
+  static uint8_t count=0;
+  static uint8_t gaitDemo = 1;
+  count++;
+  if (count>10)
+  {
+    count=0;
+    gaitDemo++;
+    if (gaitDemo==3)
+    {
+      gaitDemo=1;
+    }
+  }
+  switch (gaitDemo)
+  {
+  case 1:
+    Serial.print("tripod gait demo.\n");
+    hexaMotion.tripodGaitCycle();
+    break;
+  
+  case 2:
+    Serial.print("wave gait demo.\n");
+    hexaMotion.waveGaitCycle();
+    break;
+  }
 }

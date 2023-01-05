@@ -85,6 +85,47 @@ class HexaMotion
         HexaMotion(HexaLegs *hexaLegs)
         {
             hexa_legs = hexaLegs;
+
+            ArgsLeg up, down, backward;
+
+            up.femur = p.femur.up;
+            up.tibia = p.tibia.close;
+
+            down.femur = p.femur.down;
+            down.tibia = p.tibia.open;
+
+            backward.femur = p.femur.down;
+            backward.tibia = p.tibia.open;
+
+            up.coxa = p.rightCoxa.front.forward;
+            down.coxa = p.rightCoxa.front.forward;
+            backward.coxa = p.rightCoxa.front.backward;
+            hexa_legs->R1.argsToWalk(up, down, backward);
+
+            up.coxa = p.rightCoxa.middle.forward;
+            down.coxa = p.rightCoxa.middle.forward;
+            backward.coxa = p.rightCoxa.middle.backward;
+            hexa_legs->R2.argsToWalk(up, down, backward);
+            
+            up.coxa = p.rightCoxa.back.forward;
+            down.coxa = p.rightCoxa.back.forward;
+            backward.coxa = p.rightCoxa.back.backward;
+            hexa_legs->R3.argsToWalk(up, down, backward);
+            
+            up.coxa = p.leftCoxa.front.forward;
+            down.coxa = p.leftCoxa.front.forward;
+            backward.coxa = p.leftCoxa.front.backward;
+            hexa_legs->L1.argsToWalk(up, down, backward);
+
+            up.coxa = p.leftCoxa.middle.forward;
+            down.coxa = p.leftCoxa.middle.forward;
+            backward.coxa = p.leftCoxa.middle.backward;
+            hexa_legs->L2.argsToWalk(up, down, backward);
+            
+            up.coxa = p.leftCoxa.back.forward;
+            down.coxa = p.leftCoxa.back.forward;
+            backward.coxa = p.leftCoxa.back.backward;
+            hexa_legs->L3.argsToWalk(up, down, backward);
         }
 
         inline void checkingTibiaJoint(uint8_t vel=40)
@@ -140,40 +181,81 @@ class HexaMotion
         inline void tripodGaitCycle(uint8_t vel=20)
         {
             // legs group1 up
-            hexa_legs->R1.movimentInTask(p.rightCoxa.front.forward, p.femur.up, p.tibia.close, vel);
-            hexa_legs->R3.movimentInTask(p.rightCoxa.back.forward, p.femur.up, p.tibia.close, vel);
-            hexa_legs->L2.movimentInTask(p.leftCoxa.middle.forward, p.femur.up, p.tibia.close, vel);
+            hexa_legs->R1.liftLeg(vel);
+            hexa_legs->R3.liftLeg(vel);
+            hexa_legs->L2.liftLeg(vel);
             hexa_legs->waitMotion();
 
             // legs group1 down
-            hexa_legs->R1.movimentInTask(p.rightCoxa.front.forward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->R3.movimentInTask(p.rightCoxa.back.forward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->L2.movimentInTask(p.leftCoxa.middle.forward, p.femur.down, p.tibia.open, vel);
+            hexa_legs->R1.lowerLeg(vel);
+            hexa_legs->R3.lowerLeg(vel);
+            hexa_legs->L2.lowerLeg(vel);
             hexa_legs->waitMotion();
 
             // legs group2 up
-            hexa_legs->L1.movimentInTask(p.leftCoxa.front.forward, p.femur.up, p.tibia.close, vel);
-            hexa_legs->L3.movimentInTask(p.leftCoxa.back.forward, p.femur.up, p.tibia.close, vel);
-            hexa_legs->R2.movimentInTask(p.rightCoxa.middle.forward, p.femur.up, p.tibia.close, vel);
+            hexa_legs->L1.liftLeg(vel);
+            hexa_legs->L3.liftLeg(vel);
+            hexa_legs->R2.liftLeg(vel);
             hexa_legs->waitMotion();
 
             // legs group1 backward
-            hexa_legs->R1.movimentInTask(p.rightCoxa.front.backward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->R3.movimentInTask(p.rightCoxa.back.backward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->L2.movimentInTask(p.leftCoxa.middle.backward, p.femur.down, p.tibia.open, vel);
+            hexa_legs->R1.pushGround(vel);
+            hexa_legs->R3.pushGround(vel);
+            hexa_legs->L2.pushGround(vel);
             hexa_legs->waitMotion();
 
             // legs group2 down
-            hexa_legs->L1.movimentInTask(p.leftCoxa.front.forward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->L3.movimentInTask(p.leftCoxa.back.forward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->R2.movimentInTask(p.rightCoxa.middle.forward, p.femur.down, p.tibia.open, vel);
+            hexa_legs->L1.lowerLeg(vel);
+            hexa_legs->L3.lowerLeg(vel);
+            hexa_legs->R2.lowerLeg(vel);
             hexa_legs->waitMotion();
 
             // legs group2 backward
-            hexa_legs->L1.movimentInTask(p.leftCoxa.front.backward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->L3.movimentInTask(p.leftCoxa.back.backward, p.femur.down, p.tibia.open, vel);
-            hexa_legs->R2.movimentInTask(p.rightCoxa.middle.backward, p.femur.down, p.tibia.open, vel);
+            hexa_legs->L1.pushGround(vel);
+            hexa_legs->L3.pushGround(vel);
+            hexa_legs->R2.pushGround(vel);
             hexa_legs->waitMotion();
+        }
+        
+        inline void waveGaitCycle(uint8_t vel=20)
+        {
+            const uint32_t pushVel = 30*vel;
+
+            hexa_legs->R1.liftLeg(vel);
+            hexa_legs->R1.waitMotion();
+            hexa_legs->R1.lowerLeg(vel);
+            hexa_legs->R1.waitMotion();
+            hexa_legs->R1.pushGround(pushVel);
+                        
+            hexa_legs->R2.liftLeg(vel);
+            hexa_legs->R2.waitMotion();
+            hexa_legs->R2.lowerLeg(vel);
+            hexa_legs->R2.waitMotion();
+            hexa_legs->R2.pushGround(pushVel);
+            
+            hexa_legs->R3.liftLeg(vel);
+            hexa_legs->R3.waitMotion();
+            hexa_legs->R3.lowerLeg(vel);
+            hexa_legs->R3.waitMotion();
+            hexa_legs->R3.pushGround(pushVel);
+            
+            hexa_legs->L1.liftLeg(vel);
+            hexa_legs->L1.waitMotion();
+            hexa_legs->L1.lowerLeg(vel);
+            hexa_legs->L1.waitMotion();
+            hexa_legs->L1.pushGround(pushVel);
+            
+            hexa_legs->L2.liftLeg(vel);
+            hexa_legs->L2.waitMotion();
+            hexa_legs->L2.lowerLeg(vel);
+            hexa_legs->L2.waitMotion();
+            hexa_legs->L2.pushGround(pushVel);
+            
+            hexa_legs->L3.liftLeg(vel);
+            hexa_legs->L3.waitMotion();
+            hexa_legs->L3.lowerLeg(vel);
+            hexa_legs->L3.waitMotion();
+            hexa_legs->L3.pushGround(pushVel);
         }
 };
 

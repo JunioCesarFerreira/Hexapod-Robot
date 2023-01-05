@@ -7,6 +7,16 @@
 class Leg
 {
     private:
+        // Current positions of leg joints.
+        uint8_t positions[3]; // [coxa, femur, tibia]
+
+        // Parameters used in motion task.
+        uint8_t task_p_coxa;
+        uint8_t task_p_femur;
+        uint8_t task_p_tibia;
+        uint32_t task_p_vdelay;
+
+    protected:
         // Micro servos motors controller.
         ServoController *servo_control;
 
@@ -14,13 +24,10 @@ class Leg
         uint8_t coxa_joint_i;
         uint8_t femur_joint_i;
         uint8_t tibia_joint_i;
-
-        // Current positions of leg joints.
-        uint8_t positions[3]; // [coxa, femur, tibia]
-
-        // Parameters used in motion task.
-        uint8_t taskParameters[4]; // [coxaPos, femurPos, tibiaPos, parameterVel]
+        
+        // Parameter used in motion task.
         bool inMotion;
+
 
     private:
         // Normalized position [0 to 100].
@@ -53,7 +60,7 @@ class Leg
         inline void moveWithTaskParameters()
         {
             // Parameters: coxaJointPos, femurJointPos, tibiaJointPos, vdelay
-            moveTo(taskParameters[0], taskParameters[1], taskParameters[2], taskParameters[3]);
+            moveTo(task_p_coxa, task_p_femur, task_p_tibia, task_p_vdelay);
         }
 
     public:
@@ -75,6 +82,14 @@ class Leg
             return inMotion;
         }
 
+        void waitMotion()
+        {
+            while (isInMotion())
+            {
+                delay(10);
+            }
+        }
+
         void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
         {
             positions[0] = denormalizes(coxaJointPos);
@@ -86,13 +101,13 @@ class Leg
             servo_control->set(tibia_joint_i, positions[2]);
         }
 
-        void movimentInTask(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
+        void movimentInTask(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
             inMotion=true;
-            taskParameters[0]=coxaJointPos;
-            taskParameters[1]=femurJointPos;
-            taskParameters[2]=tibiaJointPos;
-            taskParameters[3]=vdelay;
+            task_p_coxa=coxaJointPos;
+            task_p_femur=femurJointPos;
+            task_p_tibia=tibiaJointPos;
+            task_p_vdelay=vdelay;
 		    xTaskCreate(
 			    motionTask,   // Task function.
 			    "motionTask", // String with name of task.
@@ -102,7 +117,7 @@ class Leg
 			    NULL);        // Task handle.
         }
 
-        void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
+        void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
             uint16_t values[3] = 
             {
@@ -148,6 +163,61 @@ class Leg
         }
 };
 
+struct ArgsLeg
+{
+    uint8_t coxa;
+    uint8_t femur;
+    uint8_t tibia;
+};
+
+class HikingLeg : public Leg
+{
+    private:
+        ArgsLeg lift;
+        ArgsLeg lower;
+        ArgsLeg push;
+
+    public:
+        HikingLeg() 
+        { 
+            inMotion=false;
+        }
+        HikingLeg(uint8_t coxaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
+        {
+            inMotion=false;
+            coxa_joint_i = coxaJoint;
+            femur_joint_i = femurJoint;
+            tibia_joint_i = tibiaJoint;
+            servo_control = servoControl;
+        }
+
+        // Loads movement parameters for walking.
+        void argsToWalk(ArgsLeg up, ArgsLeg down, ArgsLeg backward)
+        {
+            lift = up;
+            lower = down;
+            push = backward;
+        }
+
+        // Walking cycle liftLeg, lowerLeg, pushGround.
+        void liftLeg(uint32_t vel)
+        {
+            movimentInTask(lift.coxa, lift.femur, lift.tibia, vel);
+        }
+
+        // Walking cycle liftLeg, lowerLeg, pushGround.
+        void lowerLeg(uint32_t vel)
+        {
+            movimentInTask(lower.coxa, lower.femur, lower.tibia, vel);
+        }
+
+        // Walking cycle liftLeg, lowerLeg, pushGround.
+        void pushGround(uint32_t vel)
+        {
+            movimentInTask(push.coxa, push.femur, push.tibia, vel);
+        }
+};
+
 // Hexapod legs class
 class HexaLegs
 {
@@ -155,15 +225,15 @@ class HexaLegs
         static const uint8_t legs_number=6;
 
     public:
-        Leg R1;
-        Leg R2;
-        Leg R3;
-        Leg L1;
-        Leg L2;
-        Leg L3;
-        Leg *Legs[legs_number] ={ &R1, &R2, &R3, &L1, &L2, &L3 };
+        HikingLeg R1;
+        HikingLeg R2;
+        HikingLeg R3;
+        HikingLeg L1;
+        HikingLeg L2;
+        HikingLeg L3;
+        HikingLeg *Legs[legs_number] ={ &R1, &R2, &R3, &L1, &L2, &L3 };
 
-        void moveAll(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint8_t vdelay)
+        void moveAll(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
             for (uint8_t i=0; i<legs_number; i++)
             {
