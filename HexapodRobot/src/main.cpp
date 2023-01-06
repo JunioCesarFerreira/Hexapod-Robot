@@ -34,6 +34,10 @@ void setup()
   hexaMotion.retractedPosition();
   delay(3000);
 
+  Serial.print("checking joints.\n");
+  hexaMotion.checkingTibiaJoint();
+  hexaMotion.checkingFemurJoint();
+
   Serial.print("standing up.\n");
   hexaMotion.standingUp();
   delay(3000);
@@ -45,44 +49,46 @@ void setup()
 
 void loop() 
 {
-  static uint8_t count=0;
   static uint8_t gaitDemo = 1;
-  count++;
-  if (count>10)
-  {
-    count=0;
-    gaitDemo++;
-    if (gaitDemo==4)
-    {
-      gaitDemo=1;
-    }
-    switch (gaitDemo)
-    {
-      case 1:
-        Serial.print("tripod gait demo.\n");
-        break;
-    
-      case 2:
-        Serial.print("wave gait demo.\n");
-        break;
-
-      case 3:
-        Serial.print("ripple gait demo.\n");
-        break;
-    }
-  }
+  gaitDemo++;
+  if (gaitDemo==4) gaitDemo=1;
+  
   switch (gaitDemo)
   {
     case 1:
-      hexaMotion.tripodGaitCycle();
+      Serial.print("tripod gait demo.\n");
+      break;
+    
+    case 2:
+      Serial.print("wave gait demo.\n");
+      break;
+
+    case 3:
+      Serial.print("ripple gait demo.\n");
+      break;
+  }
+
+  switch (gaitDemo)
+  {
+    case 1:
+      for (uint8_t i=0; i<2; i++) hexaMotion.tripodGaitCycle(20, true);
+      hexaLegs.waitMotion();
+      for (uint8_t i=0; i<2; i++) hexaMotion.tripodGaitCycle(20, false);
+      hexaLegs.waitMotion();
       break;
   
     case 2:
-      hexaMotion.waveGaitCycle();
+      for (uint8_t i=0; i<2; i++) hexaMotion.waveGaitCycle(100, true);
+      hexaLegs.waitMotion();
+      for (uint8_t i=0; i<2; i++) hexaMotion.waveGaitCycle(100, false);
+      hexaLegs.waitMotion();
       break;
   
     case 3:
-      hexaMotion.rippleGaitCycle();
+      for (uint8_t i=0; i<2; i++) hexaMotion.rippleGaitCycle(160, true);
+      hexaLegs.waitMotion();
+      for (uint8_t i=0; i<2; i++) hexaMotion.rippleGaitCycle(160, false);
+      hexaLegs.waitMotion();
       break;
   }
 }
