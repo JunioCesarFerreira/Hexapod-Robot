@@ -3,15 +3,22 @@
 
 #include <ServoController.h>
 
+struct ArgsLeg
+{
+    uint8_t coxia;
+    uint8_t femur;
+    uint8_t tibia;
+};
+
 // Single leg class
 class Leg
 {
     private:
         // Current positions of leg joints.
-        uint8_t positions[3]; // [coxa, femur, tibia]
+        uint8_t positions[3]; // [coxia, femur, tibia]
 
         // Parameters used in motion task.
-        uint8_t task_p_coxa;
+        uint8_t task_p_coxia;
         uint8_t task_p_femur;
         uint8_t task_p_tibia;
         uint32_t task_p_vdelay;
@@ -21,7 +28,7 @@ class Leg
         ServoController *servo_control;
 
         // Leg joints servo indexers.
-        uint8_t coxa_joint_i;
+        uint8_t coxia_joint_i;
         uint8_t femur_joint_i;
         uint8_t tibia_joint_i;
         
@@ -30,12 +37,18 @@ class Leg
 
 
     private:
+        static const uint16_t range = SERVO_CONTROL_SUP-SERVO_CONTROL_INF;
         // Normalized position [0 to 100].
         inline uint16_t denormalizes(uint8_t pos)
         {
-            const uint16_t range = SERVO_CONTROL_SUP-SERVO_CONTROL_INF;
             pos = (pos*range)/100;
             pos += SERVO_CONTROL_INF;
+            return pos;
+        }
+        inline uint8_t normalizes(uint16_t pos)
+        {
+            pos -= SERVO_CONTROL_INF;
+            pos = 100*pos/range;
             return pos;
         }
 
@@ -59,8 +72,8 @@ class Leg
         // Moves using task parameters array
         inline void moveWithTaskParameters()
         {
-            // Parameters: coxaJointPos, femurJointPos, tibiaJointPos, vdelay
-            moveTo(task_p_coxa, task_p_femur, task_p_tibia, task_p_vdelay);
+            // Parameters: coxiaJointPos, femurJointPos, tibiaJointPos, vdelay
+            moveTo(task_p_coxia, task_p_femur, task_p_tibia, task_p_vdelay);
         }
 
     public:
@@ -68,10 +81,10 @@ class Leg
         { 
             inMotion=false;
         }
-        Leg(uint8_t coxaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
+        Leg(uint8_t coxiaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
         {
             inMotion=false;
-            coxa_joint_i = coxaJoint;
+            coxia_joint_i = coxiaJoint;
             femur_joint_i = femurJoint;
             tibia_joint_i = tibiaJoint;
             servo_control = servoControl;
@@ -90,21 +103,31 @@ class Leg
             }
         }
 
-        void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
+        ArgsLeg argsLeg()
         {
-            positions[0] = denormalizes(coxaJointPos);
+            return ArgsLeg
+            {
+                .coxia = positions[0],
+                .femur = positions[1],
+                .tibia = positions[2]
+            };
+        }
+
+        void moveTo(uint8_t coxiaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
+        {
+            positions[0] = denormalizes(coxiaJointPos);
             positions[1] = denormalizes(femurJointPos);
             positions[2] = denormalizes(tibiaJointPos);
             
-            servo_control->set(coxa_joint_i, positions[0]);
+            servo_control->set(coxia_joint_i, positions[0]);
             servo_control->set(femur_joint_i, positions[1]);
             servo_control->set(tibia_joint_i, positions[2]);
         }
 
-        void movimentInTask(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
+        void movimentInTask(uint8_t coxiaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
             inMotion=true;
-            task_p_coxa=coxaJointPos;
+            task_p_coxia=coxiaJointPos;
             task_p_femur=femurJointPos;
             task_p_tibia=tibiaJointPos;
             task_p_vdelay=vdelay;
@@ -117,17 +140,17 @@ class Leg
 			    NULL);        // Task handle.
         }
 
-        void moveTo(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
+        void moveTo(uint8_t coxiaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
             uint16_t values[3] = 
             {
-                denormalizes(coxaJointPos), 
+                denormalizes(coxiaJointPos), 
                 denormalizes(femurJointPos), 
                 denormalizes(tibiaJointPos)
             };
             uint8_t *joints[3] = 
             {
-                &coxa_joint_i, 
+                &coxia_joint_i, 
                 &femur_joint_i, 
                 &tibia_joint_i
             };
@@ -163,13 +186,6 @@ class Leg
         }
 };
 
-struct ArgsLeg
-{
-    uint8_t coxa;
-    uint8_t femur;
-    uint8_t tibia;
-};
-
 class HikingLeg : public Leg
 {
     private:
@@ -182,10 +198,10 @@ class HikingLeg : public Leg
         { 
             inMotion=false;
         }
-        HikingLeg(uint8_t coxaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
+        HikingLeg(uint8_t coxiaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
         {
             inMotion=false;
-            coxa_joint_i = coxaJoint;
+            coxia_joint_i = coxiaJoint;
             femur_joint_i = femurJoint;
             tibia_joint_i = tibiaJoint;
             servo_control = servoControl;
@@ -202,19 +218,19 @@ class HikingLeg : public Leg
         // Walking cycle liftLeg, lowerLeg, pushGround.
         void liftLeg(uint32_t vel)
         {
-            movimentInTask(lift.coxa, lift.femur, lift.tibia, vel);
+            movimentInTask(lift.coxia, lift.femur, lift.tibia, vel);
         }
 
         // Walking cycle liftLeg, lowerLeg, pushGround.
         void lowerLeg(uint32_t vel)
         {
-            movimentInTask(lower.coxa, lower.femur, lower.tibia, vel);
+            movimentInTask(lower.coxia, lower.femur, lower.tibia, vel);
         }
 
         // Walking cycle liftLeg, lowerLeg, pushGround.
         void pushGround(uint32_t vel)
         {
-            movimentInTask(push.coxa, push.femur, push.tibia, vel);
+            movimentInTask(push.coxia, push.femur, push.tibia, vel);
         }
 };
 
@@ -233,19 +249,19 @@ class HexaLegs
         HikingLeg L3;
         HikingLeg *Legs[legs_number] ={ &R1, &R2, &R3, &L1, &L2, &L3 };
 
-        void moveAll(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
+        void moveAll(uint8_t coxiaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
             for (uint8_t i=0; i<legs_number; i++)
             {
-                Legs[i]->movimentInTask(coxaJointPos, femurJointPos, tibiaJointPos, vdelay);
+                Legs[i]->movimentInTask(coxiaJointPos, femurJointPos, tibiaJointPos, vdelay);
             }
         }
 
-        void moveAll(uint8_t coxaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
+        void moveAll(uint8_t coxiaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos)
         {
             for (uint8_t i=0; i<6; i++)
             {
-                Legs[i]->moveTo(coxaJointPos, femurJointPos, tibiaJointPos);
+                Legs[i]->moveTo(coxiaJointPos, femurJointPos, tibiaJointPos);
             }
         }
 

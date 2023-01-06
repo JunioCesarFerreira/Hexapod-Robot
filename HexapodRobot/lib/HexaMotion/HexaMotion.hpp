@@ -3,7 +3,7 @@
 
 #include <Leg.hpp>
 
-struct coxaMovimentParameters
+struct coxiaMovimentParameters
 {
 	uint8_t forward;
 	uint8_t backward;
@@ -21,17 +21,17 @@ struct tibiaMovimentParameters
 	uint8_t open;
 };
 
-struct coxaParameters
+struct coxiaParameters
 {
-	coxaMovimentParameters front;
-	coxaMovimentParameters middle;
-	coxaMovimentParameters back;	
+	coxiaMovimentParameters front;
+	coxiaMovimentParameters middle;
+	coxiaMovimentParameters back;	
 };
 
 struct motionParameters
 {
-	coxaParameters rightCoxa;
-	coxaParameters leftCoxa;
+	coxiaParameters rightCoxia;
+	coxiaParameters leftCoxia;
 	femurMovimentParameters femur;	
 	tibiaMovimentParameters tibia;
 };
@@ -43,7 +43,7 @@ class HexaMotion
         HexaLegs *hexa_legs;
 		motionParameters p =
 		{
-			.rightCoxa = {
+			.rightCoxia = {
 				.front = {
 					.forward = 35,
 					.backward = 25
@@ -57,7 +57,7 @@ class HexaMotion
 					.backward = 65
 				}
 			},
-			.leftCoxa = {
+			.leftCoxia = {
 				.front = {
 					.forward = 65,
 					.backward = 75
@@ -97,34 +97,34 @@ class HexaMotion
             backward.femur = p.femur.down;
             backward.tibia = p.tibia.open;
 
-            up.coxa = p.rightCoxa.front.forward;
-            down.coxa = p.rightCoxa.front.forward;
-            backward.coxa = p.rightCoxa.front.backward;
+            up.coxia = p.rightCoxia.front.forward;
+            down.coxia = p.rightCoxia.front.forward;
+            backward.coxia = p.rightCoxia.front.backward;
             hexa_legs->R1.argsToWalk(up, down, backward);
 
-            up.coxa = p.rightCoxa.middle.forward;
-            down.coxa = p.rightCoxa.middle.forward;
-            backward.coxa = p.rightCoxa.middle.backward;
+            up.coxia = p.rightCoxia.middle.forward;
+            down.coxia = p.rightCoxia.middle.forward;
+            backward.coxia = p.rightCoxia.middle.backward;
             hexa_legs->R2.argsToWalk(up, down, backward);
             
-            up.coxa = p.rightCoxa.back.forward;
-            down.coxa = p.rightCoxa.back.forward;
-            backward.coxa = p.rightCoxa.back.backward;
+            up.coxia = p.rightCoxia.back.forward;
+            down.coxia = p.rightCoxia.back.forward;
+            backward.coxia = p.rightCoxia.back.backward;
             hexa_legs->R3.argsToWalk(up, down, backward);
             
-            up.coxa = p.leftCoxa.front.forward;
-            down.coxa = p.leftCoxa.front.forward;
-            backward.coxa = p.leftCoxa.front.backward;
+            up.coxia = p.leftCoxia.front.forward;
+            down.coxia = p.leftCoxia.front.forward;
+            backward.coxia = p.leftCoxia.front.backward;
             hexa_legs->L1.argsToWalk(up, down, backward);
 
-            up.coxa = p.leftCoxa.middle.forward;
-            down.coxa = p.leftCoxa.middle.forward;
-            backward.coxa = p.leftCoxa.middle.backward;
+            up.coxia = p.leftCoxia.middle.forward;
+            down.coxia = p.leftCoxia.middle.forward;
+            backward.coxia = p.leftCoxia.middle.backward;
             hexa_legs->L2.argsToWalk(up, down, backward);
             
-            up.coxa = p.leftCoxa.back.forward;
-            down.coxa = p.leftCoxa.back.forward;
-            backward.coxa = p.leftCoxa.back.backward;
+            up.coxia = p.leftCoxia.back.forward;
+            down.coxia = p.leftCoxia.back.forward;
+            backward.coxia = p.leftCoxia.back.backward;
             hexa_legs->L3.argsToWalk(up, down, backward);
         }
 
@@ -180,82 +180,121 @@ class HexaMotion
         // tripode cycle 
         inline void tripodGaitCycle(uint8_t vel=20)
         {
-            // legs group1 up
+            // lift legs group 1 
             hexa_legs->R1.liftLeg(vel);
             hexa_legs->R3.liftLeg(vel);
             hexa_legs->L2.liftLeg(vel);
             hexa_legs->waitMotion();
 
-            // legs group1 down
+            // lower legs group 1 
             hexa_legs->R1.lowerLeg(vel);
             hexa_legs->R3.lowerLeg(vel);
             hexa_legs->L2.lowerLeg(vel);
             hexa_legs->waitMotion();
 
-            // legs group2 up
+            // lift legs group 2
             hexa_legs->L1.liftLeg(vel);
             hexa_legs->L3.liftLeg(vel);
             hexa_legs->R2.liftLeg(vel);
             hexa_legs->waitMotion();
 
-            // legs group1 backward
+            // push ground legs group 1
             hexa_legs->R1.pushGround(vel);
             hexa_legs->R3.pushGround(vel);
             hexa_legs->L2.pushGround(vel);
             hexa_legs->waitMotion();
 
-            // legs group2 down
+            // lower legs group 2
             hexa_legs->L1.lowerLeg(vel);
             hexa_legs->L3.lowerLeg(vel);
             hexa_legs->R2.lowerLeg(vel);
             hexa_legs->waitMotion();
 
-            // legs group2 backward
+            // push ground legs group 2
             hexa_legs->L1.pushGround(vel);
             hexa_legs->L3.pushGround(vel);
             hexa_legs->R2.pushGround(vel);
             hexa_legs->waitMotion();
         }
         
-        inline void waveGaitCycle(uint8_t vel=20)
+        inline void waveGaitCycle(uint8_t vel=80)
         {
-            const uint32_t pushVel = 30*vel;
+            const uint8_t liftlowerVel = vel/8;
+            const uint32_t pushVel = 6*vel;
 
-            hexa_legs->R1.liftLeg(vel);
+            hexa_legs->R1.liftLeg(liftlowerVel);
             hexa_legs->R1.waitMotion();
-            hexa_legs->R1.lowerLeg(vel);
+            hexa_legs->R1.lowerLeg(liftlowerVel);
             hexa_legs->R1.waitMotion();
             hexa_legs->R1.pushGround(pushVel);
                         
-            hexa_legs->R2.liftLeg(vel);
+            hexa_legs->R2.liftLeg(liftlowerVel);
             hexa_legs->R2.waitMotion();
-            hexa_legs->R2.lowerLeg(vel);
+            hexa_legs->R2.lowerLeg(liftlowerVel);
             hexa_legs->R2.waitMotion();
             hexa_legs->R2.pushGround(pushVel);
             
-            hexa_legs->R3.liftLeg(vel);
+            hexa_legs->R3.liftLeg(liftlowerVel);
             hexa_legs->R3.waitMotion();
-            hexa_legs->R3.lowerLeg(vel);
+            hexa_legs->R3.lowerLeg(liftlowerVel);
             hexa_legs->R3.waitMotion();
             hexa_legs->R3.pushGround(pushVel);
             
-            hexa_legs->L1.liftLeg(vel);
+            hexa_legs->L1.liftLeg(liftlowerVel);
             hexa_legs->L1.waitMotion();
-            hexa_legs->L1.lowerLeg(vel);
+            hexa_legs->L1.lowerLeg(liftlowerVel);
             hexa_legs->L1.waitMotion();
             hexa_legs->L1.pushGround(pushVel);
             
-            hexa_legs->L2.liftLeg(vel);
+            hexa_legs->L2.liftLeg(liftlowerVel);
             hexa_legs->L2.waitMotion();
-            hexa_legs->L2.lowerLeg(vel);
+            hexa_legs->L2.lowerLeg(liftlowerVel);
             hexa_legs->L2.waitMotion();
             hexa_legs->L2.pushGround(pushVel);
             
-            hexa_legs->L3.liftLeg(vel);
+            hexa_legs->L3.liftLeg(liftlowerVel);
             hexa_legs->L3.waitMotion();
-            hexa_legs->L3.lowerLeg(vel);
+            hexa_legs->L3.lowerLeg(liftlowerVel);
             hexa_legs->L3.waitMotion();
             hexa_legs->L3.pushGround(pushVel);
+        }
+        
+        inline void rippleGaitCycle(uint8_t vel=80)
+        {
+            const uint8_t liftlowerVel = vel/8;
+            hexa_legs->R1.liftLeg(liftlowerVel);
+            hexa_legs->L2.liftLeg(liftlowerVel);
+            hexa_legs->R1.waitMotion();
+            hexa_legs->L2.waitMotion();
+            hexa_legs->R1.lowerLeg(liftlowerVel);
+            hexa_legs->L2.lowerLeg(liftlowerVel);
+            hexa_legs->R1.waitMotion();
+            hexa_legs->L2.waitMotion();
+            hexa_legs->R1.pushGround(vel);
+            hexa_legs->L2.pushGround(vel);
+
+            hexa_legs->R2.liftLeg(liftlowerVel);
+            hexa_legs->L3.liftLeg(liftlowerVel);
+            hexa_legs->R2.waitMotion();
+            hexa_legs->L3.waitMotion();
+            hexa_legs->R2.lowerLeg(liftlowerVel);
+            hexa_legs->L3.lowerLeg(liftlowerVel);
+            hexa_legs->R2.waitMotion();
+            hexa_legs->L3.waitMotion();
+            hexa_legs->R2.pushGround(vel);
+            hexa_legs->L3.pushGround(vel);
+            
+            hexa_legs->R3.liftLeg(liftlowerVel);
+            hexa_legs->L1.liftLeg(liftlowerVel);
+            hexa_legs->R3.waitMotion();
+            hexa_legs->L1.waitMotion();
+            hexa_legs->R3.lowerLeg(liftlowerVel);
+            hexa_legs->L1.lowerLeg(liftlowerVel);
+            hexa_legs->R3.waitMotion();
+            hexa_legs->L1.waitMotion();
+            hexa_legs->R3.pushGround(vel);
+            hexa_legs->L1.pushGround(vel);
+
         }
 };
 

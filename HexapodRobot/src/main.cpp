@@ -9,7 +9,7 @@ HexaMotion hexaMotion(&hexaLegs);
 void setup() 
 {
 	Serial.begin(921600);
-  Serial.print("\n\nHexapod Robot tests.\n");
+  Serial.print("\n\n\n\nHexapod Robot tests.\n");
 
   const int8_t servos_pinout[SERVOS_AMOUNT] =
   {
@@ -30,13 +30,17 @@ void setup()
   hexaLegs.L2 = HikingLeg(12,13,14, &servoControl);
   hexaLegs.L3 = HikingLeg(9,10,11, &servoControl);
 
+  Serial.print("retracted position.\n");
   hexaMotion.retractedPosition();
   delay(3000);
 
+  Serial.print("standing up.\n");
   hexaMotion.standingUp();
   delay(3000);
 
-  Serial.print("loop begin...\n");
+  Serial.print("loop begin.\n");
+  Serial.print("demonstration of walk gait:\n");
+  Serial.print("tripod gait demo.\n");
 }
 
 void loop() 
@@ -48,21 +52,37 @@ void loop()
   {
     count=0;
     gaitDemo++;
-    if (gaitDemo==3)
+    if (gaitDemo==4)
     {
       gaitDemo=1;
+    }
+    switch (gaitDemo)
+    {
+      case 1:
+        Serial.print("tripod gait demo.\n");
+        break;
+    
+      case 2:
+        Serial.print("wave gait demo.\n");
+        break;
+
+      case 3:
+        Serial.print("ripple gait demo.\n");
+        break;
     }
   }
   switch (gaitDemo)
   {
-  case 1:
-    Serial.print("tripod gait demo.\n");
-    hexaMotion.tripodGaitCycle();
-    break;
+    case 1:
+      hexaMotion.tripodGaitCycle();
+      break;
   
-  case 2:
-    Serial.print("wave gait demo.\n");
-    hexaMotion.waveGaitCycle();
-    break;
+    case 2:
+      hexaMotion.waveGaitCycle();
+      break;
+  
+    case 3:
+      hexaMotion.rippleGaitCycle();
+      break;
   }
 }
