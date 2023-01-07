@@ -1,0 +1,8 @@
+main
+	__CC2DW
+	init_sis
+		Mul_16x16_U
+	Executa_Tabela1
+		Mul_32x32_U
+		Pausa
+interrupt
