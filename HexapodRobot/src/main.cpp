@@ -72,23 +72,23 @@ void loop()
   {
     case 1:
       for (uint8_t i=0; i<2; i++) hexaMotion.tripodGaitCycle(20, true);
-      hexaLegs.waitMotion();
+      hexaLegs.taskBreak();
       for (uint8_t i=0; i<2; i++) hexaMotion.tripodGaitCycle(20, false);
-      hexaLegs.waitMotion();
+      hexaLegs.taskBreak();
       break;
   
     case 2:
       for (uint8_t i=0; i<2; i++) hexaMotion.waveGaitCycle(100, true);
-      hexaLegs.waitMotion();
+      hexaLegs.taskBreak();
       for (uint8_t i=0; i<2; i++) hexaMotion.waveGaitCycle(100, false);
-      hexaLegs.waitMotion();
+      hexaLegs.taskBreak();
       break;
   
     case 3:
       for (uint8_t i=0; i<2; i++) hexaMotion.rippleGaitCycle(160, true);
-      hexaLegs.waitMotion();
+      hexaLegs.taskBreak();
       for (uint8_t i=0; i<2; i++) hexaMotion.rippleGaitCycle(160, false);
-      hexaLegs.waitMotion();
+      hexaLegs.taskBreak();
       break;
   }
 }

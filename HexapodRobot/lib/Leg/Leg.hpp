@@ -33,7 +33,8 @@ class Leg
         uint8_t tibia_joint_i;
         
         // Parameter used in motion task.
-        bool inMotion;
+        bool in_motion;
+        bool task_break;
 
 
     private:
@@ -65,7 +66,7 @@ class Leg
             Leg *leg = (Leg*)p;
             // Set motion
             leg->moveWithTaskParameters();
-            leg->inMotion = false;
+            leg->in_motion = false;
 	        vTaskDelete(NULL);
         }
 
@@ -79,11 +80,12 @@ class Leg
     public:
         Leg() 
         { 
-            inMotion=false;
+            in_motion=false;
+            task_break=false;
         }
         Leg(uint8_t coxiaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
         {
-            inMotion=false;
+            in_motion=false;
             coxia_joint_i = coxiaJoint;
             femur_joint_i = femurJoint;
             tibia_joint_i = tibiaJoint;
@@ -92,7 +94,12 @@ class Leg
 
         bool isInMotion()
         {
-            return inMotion;
+            return in_motion;
+        }
+
+        void taskBreak()
+        {
+            task_break=true;
         }
 
         void waitMotion()
@@ -126,7 +133,8 @@ class Leg
 
         void movimentInTask(uint8_t coxiaJointPos, uint8_t femurJointPos, uint8_t tibiaJointPos, uint32_t vdelay)
         {
-            inMotion=true;
+            in_motion=true;
+            task_break=false;
             task_p_coxia=coxiaJointPos;
             task_p_femur=femurJointPos;
             task_p_tibia=tibiaJointPos;
@@ -182,6 +190,7 @@ class Leg
                     servo_control->set(*joints[i], positions[i]);
                 }
                 vTaskDelay(pdMS_TO_TICKS(vdelay));
+                if (task_break) break;
             }
         }
 };
@@ -196,11 +205,11 @@ class HikingLeg : public Leg
     public:
         HikingLeg() 
         { 
-            inMotion=false;
+            in_motion=false;
         }
         HikingLeg(uint8_t coxiaJoint, uint8_t femurJoint, uint8_t tibiaJoint, ServoController * servoControl)
         {
-            inMotion=false;
+            in_motion=false;
             coxia_joint_i = coxiaJoint;
             femur_joint_i = femurJoint;
             tibia_joint_i = tibiaJoint;
@@ -276,6 +285,14 @@ class HexaLegs
             while (isInMotion())
             {
                 delay(10);
+            }
+        }
+
+        void taskBreak()
+        {
+            for (uint8_t i=0; i<6; i++)
+            {
+                Legs[i]->taskBreak();
             }
         }
 };
