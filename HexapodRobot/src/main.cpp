@@ -11,7 +11,7 @@ void setup()
 	Serial.begin(921600);
   Serial.print("\n\n\n\nHexapod Robot tests.\n");
 
-  const int8_t servos_pinout[SERVOS_AMOUNT] =
+  const int8_t servos_pinout[NUMBER_OF_SERVOS] =
   {
     1, 2, 3,    // Righ Leg 1
     4, 5, 6,    // Righ Leg 2 
@@ -71,24 +71,30 @@ void loop()
   switch (gaitDemo)
   {
     case 1:
-      for (uint8_t i=0; i<2; i++) hexaMotion.tripodGaitCycle(20, true);
+      for (uint8_t i=0; i<3; i++) hexaMotion.tripodGaitCycle(10, true);
       hexaLegs.taskBreak();
-      for (uint8_t i=0; i<2; i++) hexaMotion.tripodGaitCycle(20, false);
+      delay(1000);
+      for (uint8_t i=0; i<3; i++) hexaMotion.tripodGaitCycle(10, false);
       hexaLegs.taskBreak();
+      delay(1000);
       break;
   
     case 2:
-      for (uint8_t i=0; i<2; i++) hexaMotion.waveGaitCycle(100, true);
+      for (uint8_t i=0; i<3; i++) hexaMotion.waveGaitCycle(50, true);
       hexaLegs.taskBreak();
-      for (uint8_t i=0; i<2; i++) hexaMotion.waveGaitCycle(100, false);
+      delay(1000);
+      for (uint8_t i=0; i<3; i++) hexaMotion.waveGaitCycle(50, false);
       hexaLegs.taskBreak();
+      delay(1000);
       break;
   
     case 3:
-      for (uint8_t i=0; i<2; i++) hexaMotion.rippleGaitCycle(160, true);
+      for (uint8_t i=0; i<3; i++) hexaMotion.rippleGaitCycle(80, true);
       hexaLegs.taskBreak();
-      for (uint8_t i=0; i<2; i++) hexaMotion.rippleGaitCycle(160, false);
+      delay(1000);
+      for (uint8_t i=0; i<3; i++) hexaMotion.rippleGaitCycle(80, false);
       hexaLegs.taskBreak();
+      delay(1000);
       break;
   }
 }

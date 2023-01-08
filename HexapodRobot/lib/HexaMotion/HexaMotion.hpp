@@ -36,48 +36,49 @@ struct motionParameters
 	tibiaMovimentParameters tibia;
 };
 
-
+// Hexapod motions
 class HexaMotion
 {
     private:
         HexaLegs *hexa_legs;
+        
 		motionParameters p =
 		{
 			.rightCoxia = {
 				.front = {
-					.forward = 35,
-					.backward = 25
+					.forward = 35,  // 63°
+					.backward = 25  // 45°
 				},
 				.middle = {
-					.forward = 55,
-					.backward = 45
+					.forward = 55, // 99°
+					.backward = 45 // 81°
 				},
 				.back = {
-					.forward = 75,
-					.backward = 65
+					.forward = 75, // 135°
+					.backward = 65 // 117°
 				}
 			},
 			.leftCoxia = {
 				.front = {
-					.forward = 65,
-					.backward = 75
+					.forward = 65, // 117°
+					.backward = 75 // 135°
 				},
 				.middle = {
-					.forward = 45,
-					.backward = 55
+					.forward = 44, // 79.2°
+					.backward = 54 // 97.2°
 				},
 				.back = {
-					.forward = 30,
-					.backward = 40
+					.forward = 30, // 54°
+					.backward = 40 // 72°
 				}
 			},
 			.femur = {
-				.up = 25,
-				.down = 50
+				.up = 25,   // 45°
+				.down = 50  // 90°
 			},
 			.tibia = {
-				.close = 5,
-				.open = 20
+				.close = 5, // 9°
+				.open = 20  // 36°
 			}
 		};
 
@@ -202,7 +203,7 @@ class HexaMotion
             hexa_legs = hexaLegs;
         }
 
-        inline void checkingTibiaJoint(uint8_t vel=40)
+        inline void checkingTibiaJoint(uint8_t vel=20)
         {
             hexa_legs->moveAll(50,5,1,vel);
             hexa_legs->waitMotion();
@@ -222,7 +223,7 @@ class HexaMotion
         }
        
 
-        inline void checkingFemurJoint(uint8_t vel=40)
+        inline void checkingFemurJoint(uint8_t vel=20)
         {
             hexa_legs->moveAll(50,5,1,vel);
             hexa_legs->waitMotion();
@@ -239,13 +240,13 @@ class HexaMotion
             hexa_legs->waitMotion();
         }
 
-        inline void standingUp(uint8_t vel=20)
+        inline void standingUp(uint8_t vel=10)
         {
             hexa_legs->moveAll(50,50,25,vel);
             hexa_legs->waitMotion();
         }
 
-        inline void retractedPosition(uint8_t vel=20)
+        inline void retractedPosition(uint8_t vel=10)
         {
             hexa_legs->moveAll(50,5,1,vel);
             hexa_legs->waitMotion();
