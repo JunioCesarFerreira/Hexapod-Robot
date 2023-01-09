@@ -1,14 +1,16 @@
 #include <ServoController.h>
 #include <Leg.hpp>
 #include <HexaMotion.hpp>
+#include <RgbPixel.hpp>
 
 ServoController servoControl;
 HexaLegs hexaLegs;
 HexaMotion hexaMotion(&hexaLegs);
+RgbPixelClass rgbPixel;
 
 void setup() 
 {
-	Serial.begin(921600);
+  Serial.begin(921600);
   Serial.print("\n\n\n\nHexapod Robot tests.\n");
 
   const int8_t servos_pinout[NUMBER_OF_SERVOS] =
@@ -29,17 +31,25 @@ void setup()
   hexaLegs.L1 = HikingLeg(15,16,17, &servoControl);
   hexaLegs.L2 = HikingLeg(12,13,14, &servoControl);
   hexaLegs.L3 = HikingLeg(9,10,11, &servoControl);
+    
+  rgbPixel.begin();
+  rgbPixel.set(RGB_RED);
 
   Serial.print("retracted position.\n");
   hexaMotion.retractedPosition();
+
+  rgbPixel.set(RGB_YELLON);
   delay(3000);
 
+  rgbPixel.set(RGB_RED);
   Serial.print("checking joints.\n");
   hexaMotion.checkingTibiaJoint();
   hexaMotion.checkingFemurJoint();
 
   Serial.print("standing up.\n");
   hexaMotion.standingUp();
+
+  rgbPixel.set(RGB_YELLON);
   delay(3000);
 
   Serial.print("loop begin.\n");
@@ -49,6 +59,7 @@ void setup()
 
 void loop() 
 {
+  rgbPixel.set(RGB_BLUE);
   static uint8_t gaitDemo = 1;
   gaitDemo++;
   if (gaitDemo==4) gaitDemo=1;
@@ -56,14 +67,17 @@ void loop()
   switch (gaitDemo)
   {
     case 1:
+      rgbPixel.set(RGB_BLUE);
       Serial.print("tripod gait demo.\n");
       break;
     
     case 2:
+      rgbPixel.set(RGB_GREEN);
       Serial.print("wave gait demo.\n");
       break;
 
     case 3:
+      rgbPixel.set(RGB_CYAN);
       Serial.print("ripple gait demo.\n");
       break;
   }
