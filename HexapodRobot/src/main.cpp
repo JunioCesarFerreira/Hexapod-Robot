@@ -1,12 +1,14 @@
 #include <ServoController.h>
 #include <Leg.hpp>
 #include <HexaMotion.hpp>
+#include <MPU6050.h>
 #include <RgbPixel.hpp>
 
 ServoController servoControl;
 HexaLegs hexaLegs;
 HexaMotion hexaMotion(&hexaLegs);
 RgbPixelClass rgbPixel;
+MPU6050Class mpu;
 
 void setup() 
 {
@@ -31,7 +33,9 @@ void setup()
   hexaLegs.L1 = HikingLeg(15,16,17, &servoControl);
   hexaLegs.L2 = HikingLeg(12,13,14, &servoControl);
   hexaLegs.L3 = HikingLeg(9,10,11, &servoControl);
-    
+  
+  mpu.begin(34,33);
+
   rgbPixel.begin();
   rgbPixel.set(RGB_RED);
 
@@ -63,6 +67,12 @@ void loop()
   static uint8_t gaitDemo = 1;
   gaitDemo++;
   if (gaitDemo==4) gaitDemo=1;
+
+  Serial.print("Test MPU650\n");
+  mpuVector vector = mpu.getAccel();
+  Serial.printf("accel=(%d, %d, %d)\n", vector.x.value, vector.y.value, vector.z.value);
+  vector = mpu.getGyro();
+  Serial.printf("gyro=(%d, %d, %d)\n", vector.x.value, vector.y.value, vector.z.value);
   
   switch (gaitDemo)
   {
