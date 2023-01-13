@@ -3,6 +3,7 @@
 #include <HexaMotion.hpp>
 #include <MPU6050.h>
 #include <RgbPixel.hpp>
+#include <Debugger.hpp>
 
 ServoController servoControl;
 HexaLegs hexaLegs;
@@ -12,8 +13,8 @@ MPU6050Class mpu;
 
 void setup() 
 {
-  Serial.begin(921600);
-  Serial.print("\n\n\n\nHexapod Robot tests.\n");
+  Serial.begin(921600); // Serial debug
+  DebuggerPrint("\n\n\n\nHexapod Robot tests.\n");
 
   const int8_t servos_pinout[NUMBER_OF_SERVOS] =
   {
@@ -39,26 +40,26 @@ void setup()
   rgbPixel.begin();
   rgbPixel.set(RGB_RED);
 
-  Serial.print("retracted position.\n");
+  DebuggerPrint("retracted position.\n");
   hexaMotion.retractedPosition();
 
   rgbPixel.set(RGB_YELLON);
   delay(3000);
 
   rgbPixel.set(RGB_RED);
-  Serial.print("checking joints.\n");
+  DebuggerPrint("checking joints.\n");
   hexaMotion.checkingTibiaJoint();
   hexaMotion.checkingFemurJoint();
 
-  Serial.print("standing up.\n");
+  DebuggerPrint("standing up.\n");
   hexaMotion.standingUp();
 
   rgbPixel.set(RGB_YELLON);
   delay(3000);
 
-  Serial.print("loop begin.\n");
-  Serial.print("demonstration of walk gait:\n");
-  Serial.print("tripod gait demo.\n");
+  DebuggerPrint("loop begin.\n");
+  DebuggerPrint("demonstration of walk gait:\n");
+  DebuggerPrint("tripod gait demo.\n");
 }
 
 void loop() 
@@ -68,7 +69,7 @@ void loop()
   gaitDemo++;
   if (gaitDemo==4) gaitDemo=1;
 
-  Serial.print("Test MPU650\n");
+  DebuggerPrint("Test MPU650\n");
   mpuVector vector = mpu.getAccel();
   Serial.printf("accel=(%d, %d, %d)\n", vector.x.value, vector.y.value, vector.z.value);
   vector = mpu.getGyro();
@@ -78,17 +79,17 @@ void loop()
   {
     case 1:
       rgbPixel.set(RGB_BLUE);
-      Serial.print("tripod gait demo.\n");
+      DebuggerPrint("tripod gait demo.\n");
       break;
     
     case 2:
       rgbPixel.set(RGB_GREEN);
-      Serial.print("wave gait demo.\n");
+      DebuggerPrint("wave gait demo.\n");
       break;
 
     case 3:
       rgbPixel.set(RGB_CYAN);
-      Serial.print("ripple gait demo.\n");
+      DebuggerPrint("ripple gait demo.\n");
       break;
   }
 
