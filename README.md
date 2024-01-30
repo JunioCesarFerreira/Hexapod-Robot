@@ -33,5 +33,5 @@ Suas contribuições são importantes para o desenvolvimento contínuo do projet
 3. Envie um pull request detalhando suas mudanças.
 
 ## Licença
-Este projeto é distribuído sob a Licença MIT. Veja o arquivo [LICENSE] para mais detalhes.
+Este projeto é distribuído sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 

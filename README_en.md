@@ -33,4 +33,4 @@ Your contributions are vital for the ongoing development of the project. To cont
 3. Submit a detailed pull request.
 
 ## License
-This project is distributed under the MIT License. See the `LICENSE` file for more details.
+This project is distributed under the MIT License. See the [LICENSE](LICENSE) file for more details.
