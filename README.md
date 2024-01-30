@@ -1,4 +1,37 @@
 # Hexapod-Robot
-Neste repositório estão alguns dados de um projeto de robô hexapod que venho implementando a algum tempo. O projeto original foi iniciado em 2016, quando desenhei e preparei a estrutura mecânica. Naquela época, minha intensão era utilizar o MCU PIC18F4550 como controlador. Na versãoa atual desenvolvida em 2023 estou utilizando o ESP32-S2. Esta é uma versão a ser completada. Pretendo ir adicionando mais detalhes do projeto (circuito eletrônico e layouts), bem como continuar evoluindo o código atual no ESP32-S2.
 
-In this repository are some data from a hexapod robot project that I've been implementing for some time. The original project was started in 2016, when I designed and prepared the mechanical structure. Back then, my intention was to use the PIC18F4550 MCU as a controller. In the current version developed in 2023 I am using ESP32-S2. This is an uncompleted version. I intend to keep adding more design details (electronic circuit and layouts) as well as continue to evolve the current code in ESP32-S2.
+🌍 *[Português](README.md) ∙ [English](README_en.md)*
+
+## Descrição
+Neste repositório estão alguns dados de um projeto de robô hexapod que venho implementando há algum tempo. O projeto original foi iniciado em 2016, quando desenhei e preparei a estrutura mecânica. Naquela época, minha intenção era utilizar o MCU PIC18F4550 como controlador. Na versão atual, desenvolvida em 2023, estou utilizando o ESP32-S2. Esta é uma versão a ser completada. Pretendo ir adicionando mais detalhes do projeto (circuito eletrônico e layouts), bem como continuar evoluindo o código atual no ESP32-S2.
+
+## Tecnologia e Componentes
+- **Microcontrolador Atual**: ESP32-S2, escolhido por seu desempenho superior e recursos de IoT.
+- **Microcontrolador Anterior**: PIC18F4550, cujo código e arquivos de projeto podem ser encontrados no diretório `OldCodePIC18F4550`.
+
+## Estrutura do Repositório
+- `HexapodRobot`: Diretório principal do projeto, contendo código-fonte, bibliotecas e testes para o ESP32-S2.
+- `MechanicProject`: Desenhos e modelos mecânicos do robô, incluindo arquivos de CAD compatíveis com Softwares como SolidWorks.
+- `OldCodePIC18F4550`: Código-fonte e documentação para o microcontrolador PIC18F4550.
+
+## Instalação e Configuração
+Para contribuir ou testar o projeto, siga estas etapas:
+1. Instale o PlatformIO IDE ou integre-o ao Visual Studio Code.
+2. Clone o repositório e navegue até o diretório `HexapodRobot`.
+3. Siga as instruções no `platformio.ini` para configurar seu ambiente de desenvolvimento.
+
+## Uso
+Instruções para montar o robô e programá-lo com o código fornecido:
+1. Monte o hardware do robô hexápode conforme os designs em `MechanicProject`.
+2. Carregue o código do diretório `HexapodRobot` no ESP32-S2.
+3. Siga as instruções detalhadas no código para controle e operações do robô.
+
+## Contribuição
+Suas contribuições são importantes para o desenvolvimento contínuo do projeto. Para contribuir:
+1. Faça um fork do repositório.
+2. Crie um branch para sua feature.
+3. Envie um pull request detalhando suas mudanças.
+
+## Licença
+Este projeto é distribuído sob a Licença MIT. Veja o arquivo [LICENSE] para mais detalhes.
+
