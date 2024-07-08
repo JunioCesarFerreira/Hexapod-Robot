@@ -7,12 +7,11 @@ This repository contains some data from a hexapod robot project that I've been i
 
 ## Technology and Components
 - **Current Microcontroller**: ESP32-S2, chosen for its superior performance and IoT features.
-- **Previous Microcontroller**: PIC18F4550, with its code and project files available in the `OldCodePIC18F4550` directory.
+- **PlatformIO with VS Code**: The firmware project was implemented using the Arduino framework on PlatformIO in VS Code.
 
 ## Repository Structure
 - `HexapodRobot`: The main project directory, containing source code, libraries, and tests for the ESP32-S2.
 - `MechanicProject`: Robot mechanical drawings and models, including CAD files compatible with software like SolidWorks.
-- `OldCodePIC18F4550`: Source code and documentation for the PIC18F4550 microcontroller.
 
 ## Installation and Setup
 To contribute or test the project, follow these steps:
