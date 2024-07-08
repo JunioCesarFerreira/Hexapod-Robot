@@ -25,6 +25,10 @@ Instruções para montar o robô e programá-lo com o código fornecido:
 2. Carregue o código do diretório `HexapodRobot` no ESP32-S2.
 3. Siga as instruções detalhadas no código para controle e operações do robô.
 
+## Protótipo
+
+![gif](./resource/vlc_YIG8amPfWw.gif)
+
 ## Contribuição
 Suas contribuições são importantes para o desenvolvimento contínuo do projeto. Para contribuir:
 1. Faça um fork do repositório.

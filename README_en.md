@@ -25,6 +25,10 @@ Instructions for assembling the robot and programming it with the provided code:
 2. Load the code from the `HexapodRobot` directory onto the ESP32-S2.
 3. Follow the detailed instructions in the code for robot control and operations.
 
+## Prototype
+
+![gif](./resource/vlc_YIG8amPfWw.gif)
+
 ## Contributing
 Your contributions are vital for the ongoing development of the project. To contribute:
 1. Fork the repository.
