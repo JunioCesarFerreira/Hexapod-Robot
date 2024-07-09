@@ -27,7 +27,7 @@ Instruções para montar o robô e programá-lo com o código fornecido:
 
 ## Protótipo
 
-![gif](./resource/vlc_YIG8amPfWw.gif)
+![prototype](./resource/prototype.gif)
 
 ## Contribuição
 Suas contribuições são importantes para o desenvolvimento contínuo do projeto. Para contribuir:
