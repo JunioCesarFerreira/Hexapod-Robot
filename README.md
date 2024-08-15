@@ -1,6 +1,6 @@
 # Hexapod-Robot
 
-🌍 *[Português](README.md) ∙ [English](README_en.md)*
+🌍 *[**Português**](README.md) ∙ [English](README_en.md)*
 
 ## Descrição
 Neste repositório estão alguns dados de um projeto de robô hexapod que venho implementando há algum tempo. O projeto original foi iniciado em 2016, quando desenhei e preparei a estrutura mecânica. Naquela época, minha intenção era utilizar o MCU PIC18F4550 como controlador. Na versão atual, desenvolvida em 2023, estou utilizando o ESP32-S2. Esta é uma versão a ser completada. Pretendo ir adicionando mais detalhes do projeto (circuito eletrônico e layouts), bem como continuar evoluindo o código atual no ESP32-S2.
